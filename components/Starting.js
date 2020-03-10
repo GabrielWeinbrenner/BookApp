@@ -3,6 +3,7 @@ import { Image, View, TextInput, Button, Text, FlatList } from "react-native";
 import Card from "./Stylesheets/Card";
 import IconStyles from "./Stylesheets/IconStyles";
 import IconButton from "./IconButton";
+import GestureRecognizer, { swipeDirections } from "react-native-swipe-gestures";
 
 export default class Starting extends React.Component {
 	constructor(props) {
@@ -14,6 +15,7 @@ export default class Starting extends React.Component {
 			currentBookValue: 0,
 			liked: [],
 			isMatched: false,
+			gestureName: "none",
 		};
 	}
 	getBooks(category) {
@@ -26,6 +28,19 @@ export default class Starting extends React.Component {
 				});
 			});
 	}
+	onSwipe = (gestureName, gestureState) => {
+		const { SWIPE_UP, SWIPE_DOWN, SWIPE_LEFT, SWIPE_RIGHT } = swipeDirections;
+		this.setState({ gestureName: gestureName });
+		switch (gestureName) {
+			case SWIPE_LEFT:
+				this.handleOnSwipedLeft();
+				break;
+			case SWIPE_RIGHT:
+				this.handleOnSwipedRight();
+				break;
+		}
+	};
+
 	returnIfFetched() {
 		// if (this.state.books.length == this.state.currentBookValue + 1) {
 		// 	console.log("Limit Reached:  " + this.state.books.length);
@@ -58,19 +73,28 @@ export default class Starting extends React.Component {
 		try {
 			return (
 				<View>
-					<View style={Card.container}>
+					<GestureRecognizer
+						onSwipe={this.onSwipe}
+						onSwipeLeft={this.onSwipeLeft}
+						onSwipeRight={this.onSwipeRight}
+						config={{
+							velocityThreshold: 0.3,
+							directionalOffsetThreshold: 80,
+						}}
+						style={Card.container}>
 						<Image
 							style={Card.image}
 							source={{
 								uri: imageURL,
 							}}
 						/>
+
 						<View style={Card.photoDescriptionContainer}>
 							<Text style={Card.text}>{title}</Text>
 
 							<Text style={Card.text}>{author}</Text>
 						</View>
-					</View>
+					</GestureRecognizer>
 					<View style={IconStyles.buttonsContainer}>
 						<IconButton
 							name="close"
@@ -95,6 +119,7 @@ export default class Starting extends React.Component {
 	handleOnSwipedLeft = () => {
 		this.setState({
 			currentBookValue: this.state.currentBookValue + 1,
+			gestureName: "none",
 		});
 		if (this.state.currentBookValue === this.state.books.length) {
 			console.log("END " + this.state.currentBookValue + " " + this.state.books.length);
@@ -109,6 +134,7 @@ export default class Starting extends React.Component {
 		this.setState({
 			liked: joined,
 			currentBookValue: this.state.currentBookValue + 1,
+			gestureName: "none",
 		});
 		if (this.state.currentBookValue === this.state.books.length) {
 			console.log("END " + this.state.currentBookValue + " " + this.state.books.length);
