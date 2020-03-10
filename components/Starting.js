@@ -1,49 +1,8 @@
 import React from "react";
-import { StyleSheet, Image, Dimensions, View, TextInput, Button, Text } from "react-native";
-const { height } = Dimensions.get("window");
-
-const styles = StyleSheet.create({
-	container: {
-		/* Setting the height according to the screen height, it also could be fixed value or based on percentage. In this example, this worked well on Android and iOS. */
-		height: height - 300,
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "white",
-		borderRadius: 5,
-		shadowColor: "black",
-		shadowOffset: {
-			width: 0,
-			height: 2,
-		},
-		marginTop: 40,
-		shadowRadius: 6,
-		shadowOpacity: 0.3,
-		elevation: 2,
-	},
-	image: {
-		borderRadius: 5,
-		flex: 1,
-		width: "100%",
-	},
-
-	photoDescriptionContainer: {
-		justifyContent: "flex-end",
-		alignItems: "flex-start",
-		flexDirection: "column",
-		height: "100%",
-		position: "absolute",
-		left: 10,
-		bottom: 10,
-	},
-	text: {
-		textAlign: "center",
-		fontSize: 30,
-		color: "white",
-		fontFamily: "Avenir",
-		textShadowColor: "black",
-		textShadowRadius: 10,
-	},
-});
+import { Image, View, TextInput, Button, Text, FlatList } from "react-native";
+import Card from "./Stylesheets/Card";
+import IconStyles from "./Stylesheets/IconStyles";
+import IconButton from "./IconButton";
 
 export default class Starting extends React.Component {
 	constructor(props) {
@@ -53,6 +12,8 @@ export default class Starting extends React.Component {
 			books: [],
 			isSubmitted: false,
 			currentBookValue: 0,
+			liked: [],
+			isMatched: false,
 		};
 	}
 	getBooks(category) {
@@ -66,16 +27,24 @@ export default class Starting extends React.Component {
 			});
 	}
 	returnIfFetched() {
-		if (this.state.books.length == this.state.currentBookValue + 1) {
-			console.log("Limit Reached:  " + this.state.books.length);
-			this.setState({
-				currentBookValue: 0,
-			});
-		}
+		// if (this.state.books.length == this.state.currentBookValue + 1) {
+		// 	console.log("Limit Reached:  " + this.state.books.length);
+		// 	this.setState({
+		// 		currentBookValue: 0,
+		// 	});
+		// }
 		var books = this.state.books;
+		var title = "";
 		var author = "";
-		var imageURL = null;
-
+		var imageURL = "";
+		try {
+			title = books[this.state.currentBookValue].volumeInfo.title;
+		} catch (error) {
+			this.setState({
+				isMatched: true,
+			});
+			console.log("No Title");
+		}
 		try {
 			author = books[this.state.currentBookValue].volumeInfo.authors[0];
 		} catch (error) {
@@ -89,27 +58,33 @@ export default class Starting extends React.Component {
 		try {
 			return (
 				<View>
-					<View style={styles.container}>
+					<View style={Card.container}>
 						<Image
-							style={styles.image}
+							style={Card.image}
 							source={{
 								uri: imageURL,
 							}}
 						/>
-						<View style={styles.photoDescriptionContainer}>
-							<Text style={styles.text}>{books[this.state.currentBookValue].volumeInfo.title}</Text>
+						<View style={Card.photoDescriptionContainer}>
+							<Text style={Card.text}>{title}</Text>
 
-							<Text style={styles.text}>{author}</Text>
+							<Text style={Card.text}>{author}</Text>
 						</View>
 					</View>
-					<View>
-						<Button
-							title="Next"
-							onPress={() =>
-								this.setState({
-									currentBookValue: this.state.currentBookValue + 1,
-								})
-							}></Button>
+					<View style={IconStyles.buttonsContainer}>
+						<IconButton
+							name="close"
+							onPress={this.handleOnSwipedLeft}
+							color="white"
+							backgroundColor="#E5566D"
+						/>
+						{/* <IconButton name="star" onPress={handleOnSwipedTop} color="white" backgroundColor="#3CA3FF" /> */}
+						<IconButton
+							name="heart"
+							onPress={this.handleOnSwipedRight}
+							color="white"
+							backgroundColor="#4CCC93"
+						/>
 					</View>
 				</View>
 			);
@@ -117,6 +92,63 @@ export default class Starting extends React.Component {
 			return error;
 		}
 	}
+	handleOnSwipedLeft = () => {
+		this.setState({
+			currentBookValue: this.state.currentBookValue + 1,
+		});
+		if (this.state.currentBookValue === this.state.books.length) {
+			console.log("END " + this.state.currentBookValue + " " + this.state.books.length);
+
+			this.setState({
+				isMatched: true,
+			});
+		}
+	};
+	handleOnSwipedRight = () => {
+		var joined = this.state.liked.concat(this.state.books[this.state.currentBookValue]);
+		this.setState({
+			liked: joined,
+			currentBookValue: this.state.currentBookValue + 1,
+		});
+		if (this.state.currentBookValue === this.state.books.length) {
+			console.log("END " + this.state.currentBookValue + " " + this.state.books.length);
+			this.setState({
+				isMatched: true,
+			});
+		}
+	};
+	renderedMatch = () => {
+		return (
+			<React.Fragment>
+				<FlatList
+					data={this.state.liked}
+					renderItem={({ item }) => (
+						<React.Fragment>
+							<Image
+								style={{ width: 100, height: 100 }}
+								source={{ uri: item.volumeInfo.imageLinks.thumbnail }}
+							/>
+							<Text style={styles.item}>{item.volumeInfo.title}</Text>
+						</React.Fragment>
+					)}
+					keyExtractor={(item) => item.id}
+				/>
+				<Button
+					title="Again?"
+					onPress={() => {
+						this.setState({
+							text: "",
+							books: [],
+							isSubmitted: false,
+							currentBookValue: 0,
+							liked: [],
+							isMatched: false,
+						});
+					}}
+				/>
+			</React.Fragment>
+		);
+	};
 	inputText = () => {
 		return (
 			<React.Fragment>
@@ -153,7 +185,11 @@ export default class Starting extends React.Component {
 		if (this.state.isSubmitted === false) {
 			return this.inputText();
 		} else {
-			return this.returnIfFetched();
+			if (this.state.isMatched === true) {
+				return this.renderedMatch();
+			} else {
+				return this.returnIfFetched();
+			}
 		}
 	}
 }
