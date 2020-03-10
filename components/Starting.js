@@ -1,10 +1,8 @@
 import React from "react";
 import { Image, View, TextInput, Button, Text, FlatList } from "react-native";
-import Card from "./Stylesheets/Card";
 import IconStyles from "./Stylesheets/IconStyles";
 import IconButton from "./IconButton";
-import GestureRecognizer, { swipeDirections } from "react-native-swipe-gestures";
-
+import Card from "./Essentials/Cards";
 export default class Starting extends React.Component {
 	constructor(props) {
 		super(props);
@@ -15,7 +13,6 @@ export default class Starting extends React.Component {
 			currentBookValue: 0,
 			liked: [],
 			isMatched: false,
-			gestureName: "none",
 		};
 	}
 	getBooks(category) {
@@ -28,26 +25,8 @@ export default class Starting extends React.Component {
 				});
 			});
 	}
-	onSwipe = (gestureName, gestureState) => {
-		const { SWIPE_UP, SWIPE_DOWN, SWIPE_LEFT, SWIPE_RIGHT } = swipeDirections;
-		this.setState({ gestureName: gestureName });
-		switch (gestureName) {
-			case SWIPE_LEFT:
-				this.handleOnSwipedLeft();
-				break;
-			case SWIPE_RIGHT:
-				this.handleOnSwipedRight();
-				break;
-		}
-	};
 
 	returnIfFetched() {
-		// if (this.state.books.length == this.state.currentBookValue + 1) {
-		// 	console.log("Limit Reached:  " + this.state.books.length);
-		// 	this.setState({
-		// 		currentBookValue: 0,
-		// 	});
-		// }
 		var books = this.state.books;
 		var title = "";
 		var author = "";
@@ -73,28 +52,15 @@ export default class Starting extends React.Component {
 		try {
 			return (
 				<View>
-					<GestureRecognizer
-						onSwipe={this.onSwipe}
-						onSwipeLeft={this.onSwipeLeft}
-						onSwipeRight={this.onSwipeRight}
-						config={{
-							velocityThreshold: 0.3,
-							directionalOffsetThreshold: 80,
-						}}
-						style={Card.container}>
-						<Image
-							style={Card.image}
-							source={{
-								uri: imageURL,
-							}}
-						/>
-
-						<View style={Card.photoDescriptionContainer}>
-							<Text style={Card.text}>{title}</Text>
-
-							<Text style={Card.text}>{author}</Text>
-						</View>
-					</GestureRecognizer>
+					<Card
+						books={books}
+						title={title}
+						author={author}
+						imageURL={imageURL}
+						handleOnSwipedLeft={this.handleOnSwipedLeft()}
+						handleOnSwipedRight={this.handleOnSwipedRight()}
+						currentBookValue={this.state.currentBookValue}
+					/>
 					<View style={IconStyles.buttonsContainer}>
 						<IconButton
 							name="close"
@@ -134,7 +100,6 @@ export default class Starting extends React.Component {
 		this.setState({
 			liked: joined,
 			currentBookValue: this.state.currentBookValue + 1,
-			gestureName: "none",
 		});
 		if (this.state.currentBookValue === this.state.books.length) {
 			console.log("END " + this.state.currentBookValue + " " + this.state.books.length);
@@ -203,6 +168,14 @@ export default class Starting extends React.Component {
 							this.getBooks(this.state.text);
 						}}
 					/>
+					<View style={IconStyles.buttonsContainer}>
+						<IconButton
+							name="arrow"
+							onPress={this.handleOnSwipedLeft}
+							color="white"
+							backgroundColor="#E5566D"
+						/>
+					</View>
 				</View>
 			</React.Fragment>
 		);
