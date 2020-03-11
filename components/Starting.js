@@ -3,8 +3,7 @@ import { Image, View, TextInput, Button, Text, FlatList } from "react-native";
 import Card from "./Stylesheets/Card";
 import IconStyles from "./Stylesheets/IconStyles";
 import IconButton from "./IconButton";
-import GestureRecognizer, { swipeDirections } from "react-native-swipe-gestures";
-
+import Swiper from "react-native-deck-swiper";
 export default class Starting extends React.Component {
 	constructor(props) {
 		super(props);
@@ -15,7 +14,6 @@ export default class Starting extends React.Component {
 			currentBookValue: 0,
 			liked: [],
 			isMatched: false,
-			gestureName: "none",
 		};
 	}
 	getBooks(category) {
@@ -28,19 +26,6 @@ export default class Starting extends React.Component {
 				});
 			});
 	}
-	onSwipe = (gestureName, gestureState) => {
-		const { SWIPE_UP, SWIPE_DOWN, SWIPE_LEFT, SWIPE_RIGHT } = swipeDirections;
-		this.setState({ gestureName: gestureName });
-		switch (gestureName) {
-			case SWIPE_LEFT:
-				this.handleOnSwipedLeft();
-				break;
-			case SWIPE_RIGHT:
-				this.handleOnSwipedRight();
-				break;
-		}
-	};
-
 	returnIfFetched() {
 		// if (this.state.books.length == this.state.currentBookValue + 1) {
 		// 	console.log("Limit Reached:  " + this.state.books.length);
@@ -73,33 +58,49 @@ export default class Starting extends React.Component {
 		try {
 			return (
 				<View>
-					<GestureRecognizer
-						onSwipe={this.onSwipe}
-						onSwipeLeft={this.onSwipeLeft}
-						onSwipeRight={this.onSwipeRight}
-						config={{
-							velocityThreshold: 0.3,
-							directionalOffsetThreshold: 80,
-						}}
-						style={Card.container}>
-						<Image
-							style={Card.image}
-							source={{
-								uri: imageURL,
+					<View style={Card.container}>
+						<Swiper
+							cards={this.state.books}
+							renderCard={(card) => {
+								return (
+									<React.Fragment>
+										<Image
+											style={Card.image}
+											source={{
+												uri: imageURL,
+											}}
+										/>
+
+										<View style={Card.photoDescriptionContainer}>
+											<Text style={Card.text}>{title}</Text>
+
+											<Text style={Card.text}>{author}</Text>
+										</View>
+									</React.Fragment>
+								);
 							}}
-						/>
-
-						<View style={Card.photoDescriptionContainer}>
-							<Text style={Card.text}>{title}</Text>
-
-							<Text style={Card.text}>{author}</Text>
-						</View>
-					</GestureRecognizer>
+							showSecondCard={false}
+							onSwipedLeft={() => {
+								this.handleOnSwipedLeft();
+							}}
+							onSwipedRight={() => {
+								this.handleOnSwipedRight();
+							}}
+							backgroundColor="none"
+							stackSize={this.state.books.length}
+							cardIndex={this.state.currentBookValue}
+							cardStyle={{
+								marginBottom: 20,
+								height: "100%",
+							}}
+							useViewOverflow={false}></Swiper>
+					</View>
 					<View style={IconStyles.buttonsContainer}>
 						<IconButton
 							name="close"
 							onPress={this.handleOnSwipedLeft}
 							color="white"
+							borderRadius={50}
 							backgroundColor="#E5566D"
 						/>
 						{/* <IconButton name="star" onPress={handleOnSwipedTop} color="white" backgroundColor="#3CA3FF" /> */}
@@ -107,6 +108,7 @@ export default class Starting extends React.Component {
 							name="heart"
 							onPress={this.handleOnSwipedRight}
 							color="white"
+							borderRadius={50}
 							backgroundColor="#4CCC93"
 						/>
 					</View>
@@ -117,9 +119,9 @@ export default class Starting extends React.Component {
 		}
 	}
 	handleOnSwipedLeft = () => {
+		console.log("left pressed");
 		this.setState({
 			currentBookValue: this.state.currentBookValue + 1,
-			gestureName: "none",
 		});
 		if (this.state.currentBookValue === this.state.books.length) {
 			console.log("END " + this.state.currentBookValue + " " + this.state.books.length);
@@ -130,11 +132,12 @@ export default class Starting extends React.Component {
 		}
 	};
 	handleOnSwipedRight = () => {
+		console.log("right pressed");
+
 		var joined = this.state.liked.concat(this.state.books[this.state.currentBookValue]);
 		this.setState({
 			liked: joined,
 			currentBookValue: this.state.currentBookValue + 1,
-			gestureName: "none",
 		});
 		if (this.state.currentBookValue === this.state.books.length) {
 			console.log("END " + this.state.currentBookValue + " " + this.state.books.length);
@@ -146,6 +149,22 @@ export default class Starting extends React.Component {
 	renderedMatch = () => {
 		return (
 			<React.Fragment>
+				<IconButton
+					name="reset"
+					onPress={() => {
+						this.setState({
+							text: "",
+							books: [],
+							isSubmitted: false,
+							currentBookValue: 0,
+							liked: [],
+							isMatched: false,
+						});
+					}}
+					borderRadius={20}
+					color="white"
+					backgroundColor="#008000"
+				/>
 				<FlatList
 					data={this.state.liked}
 					renderItem={({ item }) => (
@@ -159,19 +178,6 @@ export default class Starting extends React.Component {
 					)}
 					keyExtractor={(item) => item.id}
 				/>
-				<Button
-					title="Again?"
-					onPress={() => {
-						this.setState({
-							text: "",
-							books: [],
-							isSubmitted: false,
-							currentBookValue: 0,
-							liked: [],
-							isMatched: false,
-						});
-					}}
-				/>
 			</React.Fragment>
 		);
 	};
@@ -181,13 +187,18 @@ export default class Starting extends React.Component {
 				<View
 					style={{
 						flex: 1,
+						flexDirection: "row",
 						justifyContent: "center",
 						alignItems: "center",
 					}}>
 					<TextInput
 						style={{
-							height: 40,
-							width: 100,
+							height: 60,
+							width: 200,
+							borderColor: "black",
+							borderWidth: 0.5,
+							marginRight: 10,
+							paddingLeft: 10,
 						}}
 						placeholder="Type text"
 						onChangeText={(t) =>
@@ -197,11 +208,15 @@ export default class Starting extends React.Component {
 						}
 						value={this.state.text}
 					/>
-					<Button
-						title="Submit"
+
+					<IconButton
+						name="caretright"
 						onPress={() => {
 							this.getBooks(this.state.text);
 						}}
+						borderRadius={20}
+						color="white"
+						backgroundColor="#008000"
 					/>
 				</View>
 			</React.Fragment>

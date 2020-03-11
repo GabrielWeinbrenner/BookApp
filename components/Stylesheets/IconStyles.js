@@ -17,7 +17,7 @@ export default IconStyles = StyleSheet.create({
 		padding: 30,
 	},
 	buttonsContainer: {
-		marginTop: 50,
+		marginTop: 80,
 		flexDirection: "row",
 		justifyContent: "space-evenly",
 	},
