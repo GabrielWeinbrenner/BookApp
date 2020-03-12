@@ -3,8 +3,8 @@ import { TouchableOpacity } from "react-native";
 import { func, string } from "prop-types";
 import Icon from "react-native-vector-icons/AntDesign";
 import styles from "./Stylesheets/IconStyles";
-const IconButton = ({ onPress, name, backgroundColor, color, borderRadius }) => (
-	<TouchableOpacity style={[styles.singleButton, { backgroundColor, borderRadius }]} onPress={onPress} activeOpacity={0.85}>
+const IconButton = ({ onPress, name, backgroundColor, color, borderRadius, padding }) => (
+	<TouchableOpacity style={[styles.singleButton, { backgroundColor, borderRadius, padding }]} onPress={onPress} activeOpacity={0.85}>
 		<Icon name={name} size={20} color={color} />
 	</TouchableOpacity>
 );

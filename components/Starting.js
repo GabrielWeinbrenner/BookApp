@@ -2,6 +2,7 @@ import React from "react";
 import { Image, View, TextInput, Button, Text, FlatList } from "react-native";
 import Card from "./Stylesheets/Card";
 import IconStyles from "./Stylesheets/IconStyles";
+import flatListStyles from "./Stylesheets/FlatList";
 import IconButton from "./IconButton";
 import Swiper from "react-native-deck-swiper";
 export default class Starting extends React.Component {
@@ -79,6 +80,7 @@ export default class Starting extends React.Component {
 									</React.Fragment>
 								);
 							}}
+							disableTopSwipe={true}
 							showSecondCard={false}
 							onSwipedLeft={() => {
 								this.handleOnSwipedLeft();
@@ -93,6 +95,7 @@ export default class Starting extends React.Component {
 								marginBottom: 20,
 								height: "100%",
 							}}
+							onTapCard={(i) => {}}
 							useViewOverflow={false}></Swiper>
 					</View>
 					<View style={IconStyles.buttonsContainer}>
@@ -101,6 +104,7 @@ export default class Starting extends React.Component {
 							onPress={this.handleOnSwipedLeft}
 							color="white"
 							borderRadius={50}
+							padding={30}
 							backgroundColor="#E5566D"
 						/>
 						{/* <IconButton name="star" onPress={handleOnSwipedTop} color="white" backgroundColor="#3CA3FF" /> */}
@@ -109,6 +113,7 @@ export default class Starting extends React.Component {
 							onPress={this.handleOnSwipedRight}
 							color="white"
 							borderRadius={50}
+							padding={30}
 							backgroundColor="#4CCC93"
 						/>
 					</View>
@@ -149,8 +154,42 @@ export default class Starting extends React.Component {
 	renderedMatch = () => {
 		return (
 			<React.Fragment>
+				<View style={flatListStyles.container}>
+					<FlatList
+						data={this.state.liked}
+						renderItem={({ item }) => (
+							<View style={flatListStyles.itemContainer}>
+								<Image
+									style={flatListStyles.image}
+									source={{ uri: item.volumeInfo.imageLinks.thumbnail }}
+								/>
+								<Text style={flatListStyles.title}>{item.volumeInfo.title}</Text>
+							</View>
+						)}
+						ItemSeparatorComponent={() => (
+							<View
+								style={{
+									height: 1,
+									width: "100%",
+									backgroundColor: "#000",
+								}}
+							/>
+						)}
+						ListHeaderComponent={() => (
+							<View style={flatListStyles.header}>
+								<Text style={flatListStyles.headerText}>New Matches</Text>
+								<View style={flatListStyles.badge}>
+									<Text style={flatListStyles.badgeText}>
+										{this.state.liked.length}
+									</Text>
+								</View>
+							</View>
+						)}
+						keyExtractor={(item) => item.id}
+					/>
+				</View>
 				<IconButton
-					name="reset"
+					name="clockcircle"
 					onPress={() => {
 						this.setState({
 							text: "",
@@ -162,21 +201,9 @@ export default class Starting extends React.Component {
 						});
 					}}
 					borderRadius={20}
+					padding={30}
 					color="white"
 					backgroundColor="#008000"
-				/>
-				<FlatList
-					data={this.state.liked}
-					renderItem={({ item }) => (
-						<React.Fragment>
-							<Image
-								style={{ width: 100, height: 100 }}
-								source={{ uri: item.volumeInfo.imageLinks.thumbnail }}
-							/>
-							<Text style={styles.item}>{item.volumeInfo.title}</Text>
-						</React.Fragment>
-					)}
-					keyExtractor={(item) => item.id}
 				/>
 			</React.Fragment>
 		);
@@ -215,8 +242,9 @@ export default class Starting extends React.Component {
 							this.getBooks(this.state.text);
 						}}
 						borderRadius={20}
+						padding={20}
 						color="white"
-						backgroundColor="#008000"
+						backgroundColor="#0066cc"
 					/>
 				</View>
 			</React.Fragment>
