@@ -1,10 +1,11 @@
 import React from "react";
-import { Image, View, TextInput, Button, Text, FlatList } from "react-native";
+import { Image, View, TextInput, Button, Text, FlatList, TouchableOpacity } from "react-native";
 import Card from "./Stylesheets/Card";
 import IconStyles from "./Stylesheets/IconStyles";
 import flatListStyles from "./Stylesheets/FlatList";
 import IconButton from "./IconButton";
 import Swiper from "react-native-deck-swiper";
+import { SwipeListView } from "react-native-swipe-list-view";
 export default class Starting extends React.Component {
 	constructor(props) {
 		super(props);
@@ -155,8 +156,14 @@ export default class Starting extends React.Component {
 		return (
 			<React.Fragment>
 				<View style={flatListStyles.container}>
-					<FlatList
+					<SwipeListView
+						useFlatList
 						data={this.state.liked}
+						rightOpenValue={-75}
+						previewOpenValue={-40}
+						previewRowKey={"0"}
+						previewOpenValue={-40}
+						previewOpenDelay={3000}
 						renderItem={({ item }) => (
 							<View style={flatListStyles.itemContainer}>
 								<Image
@@ -164,6 +171,29 @@ export default class Starting extends React.Component {
 									source={{ uri: item.volumeInfo.imageLinks.thumbnail }}
 								/>
 								<Text style={flatListStyles.title}>{item.volumeInfo.title}</Text>
+							</View>
+						)}
+						renderHiddenItem={(rowData, rowMap) => (
+							<View style={flatListStyles.rowBack}>
+								<TouchableOpacity
+									style={[
+										flatListStyles.backRightBtn,
+										flatListStyles.backRightBtnRight,
+									]}
+									onPress={() => {
+										var index = rowData.index;
+										// if (rowMap[index]) {
+										// 	rowMap[index].closeRow();
+										// }
+										const newData = [...this.state.liked];
+
+										if (index !== -1) {
+											newData.splice(index, 1);
+											this.setState({ liked: newData });
+										}
+									}}>
+									<Text style={flatListStyles.backTextWhite}>Delete</Text>
+								</TouchableOpacity>
 							</View>
 						)}
 						ItemSeparatorComponent={() => (
@@ -189,7 +219,7 @@ export default class Starting extends React.Component {
 					/>
 				</View>
 				<IconButton
-					name="clockcircle"
+					name="heart"
 					onPress={() => {
 						this.setState({
 							text: "",
@@ -201,9 +231,9 @@ export default class Starting extends React.Component {
 						});
 					}}
 					borderRadius={20}
-					padding={30}
+					padding={20}
 					color="white"
-					backgroundColor="#008000"
+					backgroundColor="#ff5050"
 				/>
 			</React.Fragment>
 		);

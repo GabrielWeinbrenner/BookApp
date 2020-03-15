@@ -3,8 +3,8 @@ const { height } = Dimensions.get("window");
 
 export default styles = StyleSheet.create({
 	container: {
+		backgroundColor: "white",
 		height: height - 300,
-		// backgroundColor: "white",
 		borderRadius: 5,
 		shadowColor: "black",
 		shadowOffset: {
@@ -29,6 +29,7 @@ export default styles = StyleSheet.create({
 	itemContainer: {
 		flexDirection: "row",
 		padding: 20,
+		backgroundColor: "#fff",
 	},
 	image: {
 		height: 50,
@@ -53,7 +54,35 @@ export default styles = StyleSheet.create({
 	badgeText: {
 		textAlign: "center",
 		justifyContent: "center",
-
 		color: "#fff",
+	},
+
+	backTextWhite: {
+		color: "#FFF",
+	},
+	rowBack: {
+		backgroundColor: "#fff",
+
+		alignItems: "center",
+		flex: 1,
+		flexDirection: "row",
+		justifyContent: "space-between",
+		paddingLeft: 15,
+	},
+	backRightBtn: {
+		alignItems: "center",
+		bottom: 0,
+		justifyContent: "center",
+		position: "absolute",
+		top: 0,
+		width: 75,
+	},
+	backRightBtnLeft: {
+		backgroundColor: "#00BFFF",
+		right: 75,
+	},
+	backRightBtnRight: {
+		backgroundColor: "#ff5050",
+		right: 0,
 	},
 });
