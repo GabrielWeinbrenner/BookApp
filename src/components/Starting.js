@@ -107,10 +107,28 @@ class Starting extends React.Component {
 	parseBooks = (books) => {
 		newBooks = [];
 		for (var i = 0; i < books.length; i++) {
+			var title = "";
+			var author = "";
+			var imageURL = "";
+			try {
+				title = books[i].volumeInfo.title;
+			} catch (error) {
+				title = "";
+			}
+			try {
+				author = books[i].volumeInfo.authors[0];
+			} catch (error) {
+				author = "";
+			}
+			try {
+				imageURL = books[i].volumeInfo.imageLinks.thumbnail;
+			} catch (error) {
+				imageURL = "";
+			}
 			newBooks.push({
-				title: books[i].volumeInfo.title !== undefined ? books[i].volumeInfo.title : "",
-				author: books[i].volumeInfo.authors[0] !== undefined ? books[i].volumeInfo.authors[0] : "",
-				imageURL: books[i].volumeInfo.imageLinks.thumbnail !== undefined ? books[i].volumeInfo.imageLinks.thumbnail : "",
+				title,
+				author,
+				imageURL,
 			});
 		}
 		console.log(newBooks);
