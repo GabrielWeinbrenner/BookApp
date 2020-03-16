@@ -2,7 +2,7 @@ import React from "react";
 import { Image, View, TextInput, Button, Text, FlatList, TouchableOpacity } from "react-native";
 import flatListStyles from "./Stylesheets/FlatList";
 import IconButton from "./IconButton";
-import { SwipeListView } from "react-native-swipe-list-view";
+import { SwipeListView } from "@nvthai/react-native-swipe-list-view";
 import SubjectInput from "./essentials/SubjectInput";
 import MatchWindow from "./essentials/MatchWindow";
 export default class Starting extends React.Component {
