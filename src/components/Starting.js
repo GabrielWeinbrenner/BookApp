@@ -5,7 +5,11 @@ import IconButton from "./IconButton";
 import { SwipeListView } from "@nvthai/react-native-swipe-list-view";
 import SubjectInput from "./essentials/SubjectInput";
 import MatchWindow from "./essentials/MatchWindow";
-export default class Starting extends React.Component {
+import { uploadBooks } from "../actions/books";
+import { bindActionCreators } from "redux";
+
+import { connect } from "react-redux";
+class Starting extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -82,6 +86,8 @@ export default class Starting extends React.Component {
 				<IconButton
 					name="heart"
 					onPress={() => {
+						this.props.uploadBooks(this.state.liked);
+
 						this.setState({
 							books: [],
 							isSubmitted: false,
@@ -136,3 +142,11 @@ export default class Starting extends React.Component {
 		}
 	}
 }
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		uploadBooks: (books) => dispatch(uploadBooks(books)),
+	};
+};
+
+export default connect(null, mapDispatchToProps)(Starting);
